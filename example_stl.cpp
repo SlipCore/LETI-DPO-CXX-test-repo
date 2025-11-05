@@ -2,11 +2,12 @@
 #include <algorithm>
 #include <vector>
 #include <list>
+#include <iterator>
 
 template<typename T>
 void f(T begin, T end) {
-    std::for_each(begin ,end, [](int& x) {x *= x});
-    std::copy(begin, end, std::ostreambuf_iterator<double>(std::cout, " "));
+    std::for_each(begin ,end, [](int& x) {x *= x;});
+    std::copy(begin, end, std::ostream_iterator<double>(std::cout, " "));
 }
 
 int main() {
