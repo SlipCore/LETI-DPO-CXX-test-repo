@@ -1,0 +1,21 @@
+// пример с valgrind memcheck
+gcc -g memcheck_example.c -o memcheck_example
+valgrind --leak-check=full --track-origins=yes ./memcheck_example
+
+// пример с санитайзером
+// (можно указать несоклько санитайзеров, но выполнение прервется на первой ошибке)
+gcc -g -fsanitize=address memcheck_example.c -o memcheck_example
+./memcheck_example
+gcc -g -fsanitize=leak memcheck_example.c -o memcheck_example
+./memcheck_example
+
+
+// Время диагностики (run: $ time executable)
+// run valgrind
+real    0m2,431s
+user    0m1,921s
+sys     0m0,215s
+// run memcheck_example with sanitizer
+real    0m0,757s
+user    0m0,337s
+sys     0m0,072s

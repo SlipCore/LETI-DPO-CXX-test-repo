@@ -1,0 +1,57 @@
+1. Собрать perf
+sudo ./perf.sh
+
+2. Не очень безопасные настройки для системы, но они нужны для корректной работы perf
+echo -1 | sudo tee /proc/sys/kernel/perf_event_paranoid
+echo 0 | sudo tee /proc/sys/kernel/kptr_restrict
+
+3. Комиляция
+g++ -g -o perf perf.cpp -lm
+
+4. Запуск с перфом
+perf record -g ./perf
+
+5. отчет
+perf report
+
+6. 
+perf list
+
+Пример результата
+Performance counter stats for './perf':
+
+        175.67 msec task-clock                       #    0.998 CPUs utilized             
+                5      context-switches                 #   28.462 /sec                      
+                3      cpu-migrations                   #   17.077 /sec                      
+            2,037      page-faults                      #   11.595 K/sec                     
+    2,581,109,674      instructions                     #    3.33  insn per cycle            
+                                                #    0.01  stalled cycles per insn   
+    775,098,675      cycles                           #    4.412 GHz                       
+    25,398,580      stalled-cycles-frontend          #    3.28% frontend cycles idle      
+    337,660,609      branches                         #    1.922 G/sec                     
+        46,034      branch-misses                    #    0.01% of all branches           
+
+    0.176043501 seconds time elapsed
+
+    0.174027000 seconds user
+    0.002000000 seconds sys
+
+
+тут интересный показатель insn per cycle (IPC) -- он показывает, сколько в среднем инструкций выполняется за один такт процессора. 
+Если IPC > 2.5 это хорошо
+Если  1 < IPC < 2.5 -- неплохо, но можно подумать над оптимизацией
+Если IPC < 1, то это плохо, процессор простаивает и нужно искать причины:
+1. промахи в кэш (нелинейный доступ, огромные струруктуры, которые не влезают в кэш, нелоклаьное хранение данных, например, не в массиве, а списке)
+2. проблемы с непредсказуемым ветвлением (сложные большие условия)
+3. высокая зависимость данных (выполнение инструкции зависит от выполнение множества других иснтрукций)
+4. много системных вызовов (read write malloc и тд) + блокировки памяти
+
+
+7. 
+perf stat -e dTLB-loads,dTLB-load-misses ./<имя исполняемого файла>
+
+Показывает, насколько эффективно кэшируются инструкции
+
+8. 
+perf stat -e dTLB-loads,dTLB-load-misses ./<имя исполняемого файла>
+Показывает, насколько эффективно кэшируются адреса данных.

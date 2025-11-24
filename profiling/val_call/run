@@ -1,0 +1,7 @@
+gcc -g callgrind_example.c -o callgrind_example
+
+valgrind --tool=callgrind --dump-instr=yes ./callgrind_example
+
+kcachegrind callgrind.out.<pid>
+
+В меню слева тыкаем на main
